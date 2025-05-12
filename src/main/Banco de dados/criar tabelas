@@ -1,0 +1,31 @@
+CREATE TABLE IF NOT EXISTS pessoa (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS livro (
+    id SERIAL PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    autor VARCHAR(255) NOT NULL,
+    pessoa_id INT,
+    data_emprestimo DATE NOT NULL,
+    FOREIGN KEY (pessoa_id) REFERENCES pessoa(id)
+);
+
+CREATE TABLE regra (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    tipo VARCHAR(255) not null,
+    regra TEXT NOT NULL
+);
+
+CREATE TABLE regra_historico (
+    id SERIAL PRIMARY KEY,
+    regra_id INT NOT NULL,
+    nome VARCHAR(255) NOT NULL,
+    tipo VARCHAR(255) NOT NULL,
+    regra TEXT NOT NULL,
+    data_modificacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    usuario_modificador VARCHAR(255),
+    FOREIGN KEY (regra_id) REFERENCES regra(id)
+);

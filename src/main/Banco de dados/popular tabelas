@@ -1,0 +1,49 @@
+INSERT INTO pessoa (nome) VALUES ('Alice');
+INSERT INTO pessoa (nome) VALUES ('Bruno');
+INSERT INTO pessoa (nome) VALUES ('Carla');
+
+INSERT INTO livro (titulo, autor, pessoa_id, data_emprestimo) VALUES ('A Revolução dos Bichos', 'George Orwell', 1, '2025-05-01');
+INSERT INTO livro (titulo, autor, pessoa_id, data_emprestimo) VALUES ('O Senhor dos Anéis', 'J.R.R. Tolkien', 2, '2025-05-02');
+INSERT INTO livro (titulo, autor, pessoa_id, data_emprestimo) VALUES ('Dom Casmurro', 'Machado de Assis', 3, '2025-05-03');
+INSERT INTO livro (titulo, autor, pessoa_id, data_emprestimo) VALUES ('Capitães da Areia', 'Jorge Amado', 3, '2025-04-28');
+
+INSERT INTO regra (nome, tipo, regra) VALUES ('MultaAtraso', 'VALIDACAO_LIVRO',
+'package regrasBiblioteca;
+
+import org.biblioteca.model.Livro;
+import java.time.temporal.ChronoUnit;
+import java.time.LocalDate;
+
+function int diasAtraso(Livro livro) {
+    return (livro.getDataEmprestimo() != null) ?
+        (int) ChronoUnit.DAYS.between(livro.getDataEmprestimo(), LocalDate.now())
+        : 0;
+}
+
+rule "Aplicar Multa"
+when
+    $livro : Livro( dataEmprestimo != null, diasAtraso($livro) > 7 )
+then
+    int diasDeMulta = diasAtraso($livro) - 7;
+    double valorMulta = diasDeMulta * 2.0;
+
+    System.out.println("Multa aplicada! \nLivro: " + $livro.getTitulo() +
+                       "\nLocatário: " + $livro.getPessoa().getNome() +
+                       "\nDias de atraso: " + diasDeMulta +
+                       "\nValor da multa: R$ " + valorMulta);
+end
+');
+
+INSERT INTO regra (nome, tipo, regra) VALUES ('SalvaLivro', 'VALIDACAO_LIVRO',
+'package regrasBiblioteca;
+
+import org.biblioteca.model.Livro;
+
+rule "Validar Livro com título e autor"
+when
+    $livro : Livro( titulo == null || titulo.trim().isEmpty()
+                    || autor == null || autor.trim().isEmpty() )
+then
+    System.out.println("Livro inválido: título ou autor não pode estar vazio.");
+end
+');
