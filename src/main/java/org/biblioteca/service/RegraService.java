@@ -1,6 +1,7 @@
 package org.biblioteca.service;
 
 import org.biblioteca.repository.RegraRepository;
+import org.biblioteca.DAO.ConfiguracaoDAO;
 import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieSession;
 import org.kie.internal.utils.KieHelper;
@@ -17,6 +18,7 @@ public class RegraService {
     }
 
     public KieSession buscarRegrasPorTipo(String tipo) {
+
         List<String> regras = regraRepository.buscarRegrasPorTipo(tipo);
 
         KieHelper kieHelper = new KieHelper();
@@ -24,6 +26,14 @@ public class RegraService {
             kieHelper.addContent(regra, ResourceType.DRL);
         }
 
-        return kieHelper.build().newKieSession();
+        KieSession kSession = kieHelper.build().newKieSession();
+
+        ConfiguracaoDAO configuracaoDAO = new ConfiguracaoDAO();
+        kSession.setGlobal("configuracaoDAO", configuracaoDAO);
+
+        return kSession;
     }
+
+
+
 }
